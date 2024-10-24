@@ -1,16 +1,15 @@
 import React, {useState} from "react";
 import httpClient from "../httpClient";
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
 
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
-    const loginUser = async () => {
-        console.log(email, password);
+    const registerUser = async () => {
 
         try {
-            const resp = await httpClient.post("//localhost:5000/login", {
+            const resp = await httpClient.post("//localhost:5000/register", {
                 email,
                 password,
             });
@@ -26,7 +25,7 @@ const LoginPage: React.FC = () => {
 
     return (
         <>
-            <h1>Log into your account</h1>
+            <h1>Create an account</h1>
             <form action="">
                 <div>
                     <label>Email: </label>
@@ -46,10 +45,10 @@ const LoginPage: React.FC = () => {
                         id=""
                     />
                 </div>
-                <button type="button" onClick={() => loginUser()}>Submit</button>
+                <button type="button" onClick={() => registerUser()}>Submit</button>
             </form>
         </>
     );
 };
 
-export default LoginPage;
+export default RegisterPage;
