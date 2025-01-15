@@ -1,15 +1,16 @@
 from flask import Flask, request, jsonify, session
 from flask_session import Session
 from flask_bcrypt import Bcrypt
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from config import ApplicationConfig
-from models import db, User
+from models import db, User, Task
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 
 bcrypt = Bcrypt(app)
 cors = CORS(app, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 server_session = Session(app)   
 db.init_app(app)
 
@@ -29,6 +30,62 @@ def get_current_user():
         "id": user.id,
         "email": user.email
     })
+
+@app.route("/tasks", methods=["POST"])
+def create_task():
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "title" not in data:
+        return jsonify({"error": "Title is required"}), 400
+
+    title = data["title"]
+    description = data.get("description", "")
+    priority = data.get("priority", 0)
+
+    try:
+        new_task = Task(
+            title=title, 
+            description=description, 
+            Priority=priority,
+            user_id=user_id
+        )
+        db.session.add(new_task)
+        db.session.commit()
+
+        return jsonify({
+            "id": new_task.id,
+            "title": new_task.title,
+            "description": new_task.description,
+            "Priority": new_task.priority,
+            "completed": new_task.completed
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to create task"}), 500
+
+@app.route("/tasks", methods=["GET"])
+def get_tasks():
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    tasks = Task.query.filter_by(user_id=user_id).all()
+
+    return jsonify([{
+        "id": task.id,
+        "title": task.title,
+        "description": task.description,
+        "priority": task.priority,
+        "completed": task.completed
+    } for task in tasks])
 
 @app.route("/register", methods=["POST"])
 def register_user():
