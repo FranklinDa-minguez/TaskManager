@@ -22,6 +22,10 @@ const LandingPage: React.FC = () => {
     setUser(null);
   }
 
+  const addTask = async () => { 
+    window.location.href = "/AddTask";
+  }
+
   return (
     <>
       <h1>Welcome</h1>
@@ -31,6 +35,7 @@ const LandingPage: React.FC = () => {
           <h3>you are logged in as {user.email}</h3>
           <h3>ID: {user.id}</h3>
           <button onClick={logoutuser}>logout</button>
+          <button onClick={addTask}>Add Task</button>
         </div>
       ) : (
         <div>
