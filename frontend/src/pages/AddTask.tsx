@@ -12,7 +12,7 @@ const AddTask: React.FC = () => {
             const resp = await httpClient.post("//localhost:5000/tasks", {
                 title,
                 description,
-                Priority: parseInt(priority)
+                priority: parseInt(priority)
             });
             window.location.href = "/";
         } catch (error) {

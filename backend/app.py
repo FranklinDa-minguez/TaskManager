@@ -47,23 +47,25 @@ def create_task():
 
     title = data["title"]
     description = data.get("description", "")
-    priority = data.get("priority", 0)
+    Tpriority = data.get("priority", 5)
 
     try:
         new_task = Task(
             title=title, 
             description=description, 
-            Priority=priority,
+            priority=Tpriority,
             user_id=user_id
         )
         db.session.add(new_task)
         db.session.commit()
 
+        print(new_task.id, new_task.title, new_task.description, new_task.priority, new_task.completed)
+
         return jsonify({
             "id": new_task.id,
             "title": new_task.title,
             "description": new_task.description,
-            "Priority": new_task.priority,
+            "priority": new_task.priority,
             "completed": new_task.completed
         })
     except Exception as e:
